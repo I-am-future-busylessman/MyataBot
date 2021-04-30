@@ -20,6 +20,7 @@ public class AdminKeyboards {
         List<KeyboardRow> keyboard = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         keyboardFirstRow.add(new KeyboardButton("Список броней"));
+        keyboardFirstRow.add(new KeyboardButton("Бронь пришла"));
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         keyboardSecondRow.add(new KeyboardButton("Подтвердить бронь"));
         keyboardFirstRow.add(new KeyboardButton("Отменить бронь"));
