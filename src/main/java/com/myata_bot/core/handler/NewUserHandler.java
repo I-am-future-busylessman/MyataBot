@@ -46,7 +46,7 @@ public class NewUserHandler implements InputMessageHandler {
         List<BotApiMethod<?>> reply = new ArrayList<>();
 
         if (botState.equals(BotState.ASK_NAME)) {
-            reply.add(messageService.getReplyMessage(chatId, "От имени Myata Lounge Center приветствую вас!\n" +
+            reply.add(messageService.getReplyMessage(chatId, "От имени Amigo Lounge приветствую вас!\n" +
                     "Как я могу к вам обращаться?"));
             userService.setUserCurrentState(userId, BotState.ASK_TO_DO_FROM_UNKNOWN);
         }
