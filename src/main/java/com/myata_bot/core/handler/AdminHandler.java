@@ -123,7 +123,7 @@ public class AdminHandler implements InputMessageHandler {
                         resService.save(reservation);
                         reservationFound.set(reservation);
                         reply.add(messageService.getReplyMessage(reservation.getUserID(), "Ваша бронь подтверждена." +
-                                "\n Ждём вас в Myata Lounge Center"));
+                                "\n Ждём вас в Amigo Lounge"));
                     }
                 });
                 if (reservationFound.get().isConfirmed()) {
