@@ -58,16 +58,18 @@ public class FillingReservationHandler implements InputMessageHandler {
         LocalDateTime date = LocalDateTime.now();
         List<BotApiMethod<?>> reply = new ArrayList<>();
         if (message.getText().equals("Назад")){
-            userService.stepBack(userId);
-            reply.add(messageService.getReplyMessage(userId, chooser.chooseForState(userService.getUserCurrentState(chatId)), UserKeyboards.userReservePanel()));
-
+            stepBack(userId);
+            reply.add(messageService.getReplyMessage(chatId, chooser.chooseForState(userService.getUserCurrentState(chatId))));
         }
         else if (botState.equals(BotState.COLLECT_DATE_ASK_TIME)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm");
             try {
                 date = LocalDateTime.parse(message.getText() + ".2021 23:59", formatter);
-                if (date.isBefore(LocalDateTime.now()))
+                if (date.isBefore(LocalDateTime.now())) {
                     valid = false;
+                    reply.add(messageService.getReplyMessage(chatId, "Неправильный ввод даты или дата уже прошла. \n Формат: 22.09"));
+                    userService.setUserCurrentState(userId, BotState.COLLECT_DATE_ASK_TIME);
+                }
             }catch (DateTimeParseException e) {
                 e.printStackTrace();
                 reply.add(messageService.getReplyMessage(chatId, "Неправильный ввод даты или дата уже прошла. \n Формат: 22.09"));
@@ -127,6 +129,33 @@ public class FillingReservationHandler implements InputMessageHandler {
             userService.setUserCurrentState(userId, BotState.COLLECT_TO_DO);
         }
         return reply;
+    }
+
+    private void stepBack(int userId){
+        BotState userCurrentState = userService.getUserCurrentState(userId);
+        userService.setUserCurrentState(userId, switch (userCurrentState){
+            case MAIN_ADMIN -> null;
+            case ASK_ADMIN_NAME -> null;
+            case ASK_ADMIN_TO_DO -> null;
+            case COLLECT_ADMIN_TO_DO -> null;
+            case COLLECT_ADMIN_NAME -> null;
+            case ASK_ADMIN_CONFIRM_RESERVATION -> null;
+            case COLLECT_ADMIN_CONFIRM_RESERVATION -> null;
+            case COLLECT_ADMIN_DELETE_RESERVATION -> null;
+            case COLLECT_ADMIN_ARRIVED_RESERVATION -> null;
+            case FILLING_PROFILE -> null;
+            case FILLING_RESERVATION -> null;
+            case ASK_NAME -> null;
+            case COLLECT_DATE_ASK_TIME -> BotState.COLLECT_DATE_ASK_TIME;
+            case COLLECT_TIME_ASK_AMOUNT_OF_PEOPLE -> BotState.COLLECT_DATE_ASK_TIME;
+            case COLLECT_AMOUNT_OF_PEOPLE_ASK_PHONE_NUMBER -> BotState.COLLECT_TIME_ASK_AMOUNT_OF_PEOPLE;
+            case COLLECT_COMMENT_AND_COMPLETE -> BotState.COLLECT_PHONE_NUMBER_ASK_COMMENT;
+            case COLLECT_PHONE_NUMBER_ASK_COMMENT -> BotState.COLLECT_AMOUNT_OF_PEOPLE_ASK_PHONE_NUMBER;
+            case MAIN -> null;
+            case ASK_TO_DO_FROM_UNKNOWN -> null;
+            case ASK_TO_DO -> null;
+            case COLLECT_TO_DO -> null;
+        });
     }
 
     @Override
