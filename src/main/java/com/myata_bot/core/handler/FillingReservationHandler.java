@@ -59,7 +59,7 @@ public class FillingReservationHandler implements InputMessageHandler {
         List<BotApiMethod<?>> reply = new ArrayList<>();
         if (message.getText().equals("Назад")){
             stepBack(userId);
-            reply.add(messageService.getReplyMessage(chatId, chooser.chooseForState(userService.getUserCurrentState(chatId))));
+            reply.add(messageService.getReplyMessage(chatId, chooser.chooseForPreviousState(userService.getUserCurrentState(chatId))));
         }
         else if (botState.equals(BotState.COLLECT_DATE_ASK_TIME)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm");

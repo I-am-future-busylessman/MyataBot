@@ -50,7 +50,7 @@ public class TextChooser {
             case COLLECT_TIME_ASK_AMOUNT_OF_PEOPLE -> "На какое количество человек забронировать столик?";
             case COLLECT_AMOUNT_OF_PEOPLE_ASK_PHONE_NUMBER -> "По какому номеру с вами возможно связаться?";
             case COLLECT_PHONE_NUMBER_ASK_COMMENT -> "Если есть какие-то дополнительные пожелания, напишите их ниже.";
-            case COLLECT_COMMENT_AND_COMPLETE -> "Если есть какие-то дополнительные пожелания, напишите их ниже.";
+            case COLLECT_COMMENT_AND_COMPLETE -> "Спасибо что забронировали у нас столик! \n Ожидайте подтверждения.";
             case MAIN -> null;
             case ASK_TO_DO_FROM_UNKNOWN -> null;
             case ASK_TO_DO -> null;
