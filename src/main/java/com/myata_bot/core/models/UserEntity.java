@@ -13,4 +13,14 @@ public class UserEntity {
     String name;
     String role;
     String userState;
+    String previousState;
+
+    public void setState(String state) {
+        previousState = userState;
+        userState = state;
+    }
+
+    public void stepBack() {
+        userState = previousState;
+    }
 }
