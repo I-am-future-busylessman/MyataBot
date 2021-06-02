@@ -2,6 +2,8 @@ package com.myata_bot.core.handler;
 
 import com.myata_bot.core.botapi.BotState;
 import com.myata_bot.core.botapi.InputMessageHandler;
+import com.myata_bot.core.botapi.TextChooser;
+import com.myata_bot.core.keyboards.UserKeyboards;
 import com.myata_bot.core.models.ReservationEntity;
 import com.myata_bot.core.models.UserEntity;
 import com.myata_bot.core.services.ReplyService;
@@ -29,11 +31,13 @@ public class FillingReservationHandler implements InputMessageHandler {
     private final UserService userService;
     private final ReplyService messageService;
     private final ReservationService resService;
+    private final TextChooser chooser;
 
-    public FillingReservationHandler(UserService userService, ReplyService messageService, ReservationService resService) {
+    public FillingReservationHandler(UserService userService, ReplyService messageService, ReservationService resService, TextChooser chooser) {
         this.userService = userService;
         this.messageService = messageService;
         this.resService = resService;
+        this.chooser = chooser;
     }
 
     @Override
@@ -49,31 +53,35 @@ public class FillingReservationHandler implements InputMessageHandler {
         long chatId = message.getChatId();
 
         BotState botState = userService.getUserCurrentState(userId);
-        UserEntity userEntity = userService.findUserByID(userId);
         ReservationEntity reservationEntity = resService.findByUserID(userId);
         boolean valid = true;
         LocalDateTime date = LocalDateTime.now();
         List<BotApiMethod<?>> reply = new ArrayList<>();
+        if (message.getText().equals("Назад")){
+            userService.stepBack(userId);
+            reply.add(messageService.getReplyMessage(userId, chooser.chooseForState(userService.getUserCurrentState(chatId)), UserKeyboards.userReservePanel()));
 
-        if (botState.equals(BotState.COLLECT_DATE_ASK_TIME)) {
+        }
+        else if (botState.equals(BotState.COLLECT_DATE_ASK_TIME)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm");
             try {
-                date = LocalDateTime.parse(message.getText() + ".2021 00:00", formatter);
+                date = LocalDateTime.parse(message.getText() + ".2021 23:59", formatter);
+                if (date.isBefore(LocalDateTime.now()))
+                    valid = false;
             }catch (DateTimeParseException e) {
                 e.printStackTrace();
-                reply.add(messageService.getReplyMessage(chatId, "Неправильный ввод даты. \n Формат: 22.09"));
+                reply.add(messageService.getReplyMessage(chatId, "Неправильный ввод даты или дата уже прошла. \n Формат: 22.09"));
                 userService.setUserCurrentState(userId, BotState.COLLECT_DATE_ASK_TIME);
                 valid = false;
             }
             if (valid){
                 reservationEntity.setDateTime(date);
-                reply.add(messageService.getReplyMessage(chatId, "В какое время вам было бы удобнее всего нас посетить? " +
-                        "\n Формат: 17:05"));
+                reply.add(messageService.getReplyMessage(chatId, chooser.chooseForState(userService.getUserCurrentState(chatId)), UserKeyboards.userReservePanel()));
                 userService.setUserCurrentState(userId, BotState.COLLECT_TIME_ASK_AMOUNT_OF_PEOPLE);
                 resService.save(reservationEntity);
             }
         }
-        if (botState.equals(BotState.COLLECT_TIME_ASK_AMOUNT_OF_PEOPLE)) {
+        else if (botState.equals(BotState.COLLECT_TIME_ASK_AMOUNT_OF_PEOPLE)) {
             try {
                 date = resService.findByUserID(userId).getDateTime().withHour(Integer.parseInt(message.getText().split(":")[0])).withMinute(Integer.parseInt(message.getText().split(":")[1]));
             }catch (DateTimeException e) {
@@ -84,30 +92,30 @@ public class FillingReservationHandler implements InputMessageHandler {
             }
             if (valid) {
                 reservationEntity.setDateTime(date);
-                reply.add(messageService.getReplyMessage(chatId, "На какое количество человек забронировать столик?"));
+                reply.add(messageService.getReplyMessage(chatId, chooser.chooseForState(userService.getUserCurrentState(chatId)), UserKeyboards.userReservePanel()));
                 userService.setUserCurrentState(userId, BotState.COLLECT_AMOUNT_OF_PEOPLE_ASK_PHONE_NUMBER);
                 resService.save(reservationEntity);
             }
         }
-        if (botState.equals(BotState.COLLECT_AMOUNT_OF_PEOPLE_ASK_PHONE_NUMBER)) {
+        else if (botState.equals(BotState.COLLECT_AMOUNT_OF_PEOPLE_ASK_PHONE_NUMBER)) {
             reservationEntity.setAmountOfPeople(message.getText());
-            reply.add(messageService.getReplyMessage(chatId, "По какому номеру с вами возможно связаться?"));
+            reply.add(messageService.getReplyMessage(chatId, chooser.chooseForState(userService.getUserCurrentState(chatId)), UserKeyboards.userReservePanel()));
             userService.setUserCurrentState(userId, BotState.COLLECT_PHONE_NUMBER_ASK_COMMENT);
             resService.save(reservationEntity);
         }
-        if (botState.equals(BotState.COLLECT_PHONE_NUMBER_ASK_COMMENT)) {
+        else if (botState.equals(BotState.COLLECT_PHONE_NUMBER_ASK_COMMENT)) {
             if (!message.getText().matches("^(\\s*)?(\\+)?([- _():=+]?\\d[- _():=+]?){10,14}(\\s*)?$")){
                 reply.add(messageService.getReplyMessage(chatId, "Неправильный ввод номера."));
                 valid = false;
             }
             if (valid) {
                 reservationEntity.setPhoneNumber(message.getText());
-                reply.add(messageService.getReplyMessage(chatId, "Если есть какие-то дополнительные пожелания, напишите их ниже."));
+                reply.add(messageService.getReplyMessage(chatId, chooser.chooseForState(userService.getUserCurrentState(chatId)), UserKeyboards.userReservePanel()));
                 userService.setUserCurrentState(userId, BotState.COLLECT_COMMENT_AND_COMPLETE);
                 resService.save(reservationEntity);
             }
         }
-        if (botState.equals(BotState.COLLECT_COMMENT_AND_COMPLETE)) {
+        else if (botState.equals(BotState.COLLECT_COMMENT_AND_COMPLETE)) {
             reservationEntity.setComment(message.getText());
             reservationEntity.setCompleted(true);
             resService.save(reservationEntity);
@@ -115,8 +123,7 @@ public class FillingReservationHandler implements InputMessageHandler {
                  ) {
                 reply.add(messageService.getReplyMessage(admin.getUserID(), "Новый запрос!\n" + resService.getReservationInfo(userId)));
             }
-            reply.add(messageService.getReplyMessage(chatId, "Спасибо что забронировали у нас столик!" +
-                    "\n Ожидайте подтверждения."));
+            reply.add(messageService.getReplyMessage(chatId, chooser.chooseForState(userService.getUserCurrentState(chatId)), UserKeyboards.userMainPanel()));
             userService.setUserCurrentState(userId, BotState.COLLECT_TO_DO);
         }
         return reply;

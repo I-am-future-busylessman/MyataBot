@@ -47,7 +47,17 @@ public class UserService {
             user = new UserEntity();
             user.setUserID(userID);
         }
-        user.setUserState(userState.name());
+        user.setState(userState.name());
+        updateUser(user);
+    }
+
+    public void stepBack(int userID) {
+        UserEntity user =  userRepository.findByUserID(userID);
+        if (user == null) {
+            user = new UserEntity();
+            user.setUserID(userID);
+        }
+        user.stepBack();
         updateUser(user);
     }
 }

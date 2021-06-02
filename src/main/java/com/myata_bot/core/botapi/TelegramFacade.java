@@ -44,7 +44,7 @@ public class TelegramFacade {
             UserEntity userEntity = new UserEntity();
             userEntity.setUserID(userId);
             userEntity.setRole("guest");
-            userEntity.setUserState(BotState.ASK_NAME.name());
+            userEntity.setState(BotState.ASK_NAME.name());
             userService.save(userEntity);
             botState = BotState.ASK_NAME;
         }
@@ -52,7 +52,7 @@ public class TelegramFacade {
             UserEntity userEntity = new UserEntity();
             userEntity.setUserID(userId);
             userEntity.setRole("admin");
-            userEntity.setUserState(BotState.ASK_NAME.name());
+            userEntity.setState(BotState.ASK_NAME.name());
             userService.save(userEntity);
             botState = BotState.ASK_ADMIN_NAME;
         }
