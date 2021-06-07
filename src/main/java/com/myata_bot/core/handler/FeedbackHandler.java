@@ -2,6 +2,7 @@ package com.myata_bot.core.handler;
 
 import com.myata_bot.core.botapi.BotState;
 import com.myata_bot.core.botapi.InputMessageHandler;
+import com.myata_bot.core.keyboards.UserKeyboards;
 import com.myata_bot.core.models.ReservationEntity;
 import com.myata_bot.core.services.ReplyService;
 import com.myata_bot.core.services.ReservationService;
@@ -43,7 +44,9 @@ public class FeedbackHandler implements InputMessageHandler {
     private List<BotApiMethod<?>> processUserInput(Message message) {
         int userId = message.getFrom().getId();
         long chatId = message.getChatId();
-        ReservationEntity reservation = reservationService.findByUserID(userId);
+        System.out.println(userId);
+        ReservationEntity reservation = reservationService.findByUserIdForFeedback(userId);
+        System.out.println(reservation);
 
         BotState botState = userService.getUserCurrentState(userId);
 
@@ -60,8 +63,8 @@ public class FeedbackHandler implements InputMessageHandler {
             reservationService.delete(userId);
             reservation.setUserID(0);
             reservationService.save(reservation);
-            reply.add(messageService.getReplyMessage(chatId, "Спасибо что оставили отзыв. Будем рады видеть вас снова!"));
-            userService.setUserCurrentState(userId, BotState.COLLECT_FEEDBACK_COMMENT);
+            reply.add(messageService.getReplyMessage(chatId, "Спасибо что оставили отзыв. Будем рады видеть вас снова!", UserKeyboards.userMainPanel()));
+            userService.setUserCurrentState(userId, BotState.COLLECT_TO_DO);
         }
         return reply;
     }

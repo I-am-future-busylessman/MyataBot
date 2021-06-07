@@ -15,4 +15,5 @@ public interface ReservationRepository  extends MongoRepository<ReservationEntit
     List<ReservationEntity> findAllByDoneIsFalse();
     List<ReservationEntity> findAllByDateTimeBetween(LocalDateTime first, LocalDateTime second);
     List<ReservationEntity> findAllByDoneIsTrue();
+    ReservationEntity findByUserID(int userD);
 }

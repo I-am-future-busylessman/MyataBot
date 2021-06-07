@@ -28,6 +28,10 @@ public class ReservationService {
         return resRepo.findByUserIDAndDoneIsFalse(userID);
     }
 
+    public ReservationEntity findByUserIdForFeedback(int userId){
+        return resRepo.findByUserID(userId);
+    }
+
     public List<ReservationEntity> findAll() {
         return resRepo.findAll();
     }

@@ -16,6 +16,7 @@ public class TextChooser {
             case COLLECT_ADMIN_CONFIRM_RESERVATION -> null;
             case COLLECT_ADMIN_DELETE_RESERVATION -> null;
             case COLLECT_ADMIN_ARRIVED_RESERVATION -> null;
+            case COLLECT_ADMIN_LEAVE_RESERVATION -> null;
             case FILLING_PROFILE -> null;
             case FILLING_RESERVATION -> null;
             case ASK_NAME -> null;
@@ -29,6 +30,9 @@ public class TextChooser {
             case ASK_TO_DO_FROM_UNKNOWN -> null;
             case ASK_TO_DO -> null;
             case COLLECT_TO_DO -> null;
+            case COLLECTING_FEEDBACK -> null;
+            case COLLECT_FEEDBACK_SCORE -> null;
+            case COLLECT_FEEDBACK_COMMENT -> null;
         };
     }
 
@@ -43,6 +47,7 @@ public class TextChooser {
             case COLLECT_ADMIN_CONFIRM_RESERVATION -> null;
             case COLLECT_ADMIN_DELETE_RESERVATION -> null;
             case COLLECT_ADMIN_ARRIVED_RESERVATION -> null;
+            case COLLECT_ADMIN_LEAVE_RESERVATION -> null;
             case FILLING_PROFILE -> null;
             case FILLING_RESERVATION -> null;
             case ASK_NAME -> null;
@@ -55,6 +60,9 @@ public class TextChooser {
             case ASK_TO_DO_FROM_UNKNOWN -> null;
             case ASK_TO_DO -> null;
             case COLLECT_TO_DO -> null;
+            case COLLECTING_FEEDBACK -> null;
+            case COLLECT_FEEDBACK_SCORE -> null;
+            case COLLECT_FEEDBACK_COMMENT -> null;
         };
     }
 }

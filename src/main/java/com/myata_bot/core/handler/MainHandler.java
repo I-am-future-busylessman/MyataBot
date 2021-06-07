@@ -60,7 +60,7 @@ public class MainHandler implements InputMessageHandler {
         if (botState.equals(BotState.COLLECT_TO_DO)) {
             switch (message.getText()) {
                 case "Забронировать столик" -> {
-                    if (!resService.findByUserID(userId).isDone()){
+                    if (resService.findByUserID(userId) != null){
                         reply.add(messageService.getReplyMessage(userId, "У вас уже имеется активная бронь."));
                     } else {
                         ReservationEntity reservationEntity = new ReservationEntity();
@@ -85,9 +85,12 @@ public class MainHandler implements InputMessageHandler {
                     if (resService.findByUserID(userId) != null) {
                         for (UserEntity admin : userService.findAllAdmins()
                         ) {
-                            reply.add(messageService.getReplyMessage(admin.getUserID(), "Пользователь" + userEntity.getName() + " отменил бронь на " + resService.findByUserID(userId).getDateTime(), AdminKeyboards.adminMainPanel()));
+                            reply.add(messageService.getReplyMessage(admin.getUserID(), "Пользователь" + userEntity.getName() + " отменил бронь на " + resService.findByUserID(userId).getDateTime() + " номер для связи " + resService.findByUserID(userId).getPhoneNumber(), AdminKeyboards.adminMainPanel()));
                         }
-                        resService.delete(userId);
+                        ReservationEntity reservation = resService.findByUserIdForFeedback(userId);
+                        reservation.setUserID(0);
+                        reservation.setFeedback("Отменена пользователем");
+                        resService.save(reservation);
                         reply.add(messageService.getReplyMessage(userId, "Бронь успешно отменена" +
                                 "\nМожет я могу помочь чем-то ешё?", UserKeyboards.userMainPanel()));
                     } else {

@@ -118,7 +118,7 @@ public class AdminHandler implements InputMessageHandler {
                 default:
                     reply.add(messageService.getReplyMessage(userId, "Не понял вас...\n" +
                             "Чем ещё могу помочь?", AdminKeyboards.adminMainPanel()));
-                    userService.setUserCurrentState(userId, BotState.COLLECT_TO_DO);
+                    userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_TO_DO);
                     break;
             }
         }
@@ -167,7 +167,10 @@ public class AdminHandler implements InputMessageHandler {
                     for (UserEntity admin: userService.findAllAdmins()){
                         reply.add(messageService.getReplyMessage(admin.getUserID(), "Бронь на имя " + reservationFound.get().getName() + " на время " + reservationFound.get().getDateTime().format(DateTimeFormatter.ofPattern("dd HH:mm")) + " отменена." , AdminKeyboards.adminMainPanel()));
                     }
-                    resService.delete(reservationFound.get().getUserID());
+                    ReservationEntity reservation = reservationFound.get();
+                    reservation.setUserID(0);
+                    reservation.setFeedback("Отменена Администратором");
+                    resService.save(reservation);
                     reply.add(messageService.getReplyMessage(chatId,
                             "Чем ещё могу помочь?", AdminKeyboards.adminMainPanel()));
                     userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_TO_DO);

@@ -33,6 +33,8 @@ public class BotStateContext {
             return messageHandlers.get(BotState.FILLING_RESERVATION);
         }else if(currentBotState.equals(BotState.MAIN_ADMIN)) {
             return messageHandlers.get(BotState.MAIN_ADMIN);
+        }else if(currentBotState.equals(BotState.COLLECTING_FEEDBACK)) {
+            return messageHandlers.get(BotState.COLLECTING_FEEDBACK);
         }
         else {
             return messageHandlers.get(BotState.MAIN);
@@ -55,7 +57,7 @@ public class BotStateContext {
                     ASK_ADMIN_CONFIRM_RESERVATION,
                     COLLECT_ADMIN_CONFIRM_RESERVATION,
                     COLLECT_ADMIN_ARRIVED_RESERVATION,
-                    COLLECT_ADMIN_DELETE_RESERVATION -> BotState.MAIN_ADMIN;
+                    COLLECT_ADMIN_DELETE_RESERVATION, COLLECT_ADMIN_LEAVE_RESERVATION -> BotState.MAIN_ADMIN;
             case COLLECT_FEEDBACK_SCORE, COLLECT_FEEDBACK_COMMENT -> BotState.COLLECTING_FEEDBACK;
             default -> BotState.MAIN;
         };

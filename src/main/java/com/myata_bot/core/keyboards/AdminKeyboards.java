@@ -21,9 +21,10 @@ public class AdminKeyboards {
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         keyboardFirstRow.add(new KeyboardButton("Список броней"));
         keyboardFirstRow.add(new KeyboardButton("Бронь пришла"));
+        keyboardFirstRow.add(new KeyboardButton("Столик ушёл"));
         KeyboardRow keyboardSecondRow = new KeyboardRow();
         keyboardSecondRow.add(new KeyboardButton("Подтвердить бронь"));
-        keyboardFirstRow.add(new KeyboardButton("Отменить бронь"));
+        keyboardSecondRow.add(new KeyboardButton("Отменить бронь"));
         keyboard.add(keyboardFirstRow);
         keyboard.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboard);
