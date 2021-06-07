@@ -39,7 +39,11 @@ public class ReservationService {
     public List<ReservationEntity> findAllUndone () {return resRepo.findAllByDoneIsFalse();}
 
     public List<ReservationEntity> findAllNearest() {
-        return resRepo.findAllByDateTimeBetween(LocalDateTime.now().minusHours(1), LocalDateTime.now().plusDays(1));
+        return resRepo.findAllByDateTimeBetween(LocalDateTime.now().minusHours(2), LocalDateTime.now().plusDays(1));
+    }
+
+    public List<ReservationEntity> findAllActive() {
+        return resRepo.findAllByDoneIsTrue();
     }
 
     public String getReservationInfo(int userId){

@@ -56,6 +56,7 @@ public class BotStateContext {
                     COLLECT_ADMIN_CONFIRM_RESERVATION,
                     COLLECT_ADMIN_ARRIVED_RESERVATION,
                     COLLECT_ADMIN_DELETE_RESERVATION -> BotState.MAIN_ADMIN;
+            case COLLECT_FEEDBACK_SCORE, COLLECT_FEEDBACK_COMMENT -> BotState.COLLECTING_FEEDBACK;
             default -> BotState.MAIN;
         };
     }

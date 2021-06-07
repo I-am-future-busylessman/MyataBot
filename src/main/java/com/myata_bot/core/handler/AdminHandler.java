@@ -3,6 +3,7 @@ package com.myata_bot.core.handler;
 import com.myata_bot.core.botapi.BotState;
 import com.myata_bot.core.keyboards.AdminKeyboards;
 import com.myata_bot.core.botapi.InputMessageHandler;
+import com.myata_bot.core.keyboards.UserKeyboards;
 import com.myata_bot.core.models.ReservationEntity;
 import com.myata_bot.core.models.UserEntity;
 import com.myata_bot.core.services.ReplyService;
@@ -105,6 +106,15 @@ public class AdminHandler implements InputMessageHandler {
                         userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_ARRIVED_RESERVATION);
                     }
                     break;
+                case "Столик ушёл":
+                    if (resService.findAllActive().size() == 0){
+                        reply.add(messageService.getReplyMessage(userId, "Нет активных столиков", AdminKeyboards.adminMainPanel()));
+                    }else {
+                        reply.add(messageService.getReplyMessage(userId, "Какая из броней ушла?",
+                                AdminKeyboards.adminReservationsPanel(resService.findAllActive())));
+                        userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_LEAVE_RESERVATION);
+                    }
+                    break;
                 default:
                     reply.add(messageService.getReplyMessage(userId, "Не понял вас...\n" +
                             "Чем ещё могу помочь?", AdminKeyboards.adminMainPanel()));
@@ -154,7 +164,6 @@ public class AdminHandler implements InputMessageHandler {
                 });
                 System.out.println(reservationFound);
                 if (reservationFound.get().isCompleted()) {
-                    System.out.println("here");
                     for (UserEntity admin: userService.findAllAdmins()){
                         reply.add(messageService.getReplyMessage(admin.getUserID(), "Бронь на имя " + reservationFound.get().getName() + " на время " + reservationFound.get().getDateTime().format(DateTimeFormatter.ofPattern("dd HH:mm")) + " отменена." , AdminKeyboards.adminMainPanel()));
                     }
@@ -177,15 +186,45 @@ public class AdminHandler implements InputMessageHandler {
                 resService.findAllNearest().forEach(reservation -> {
                     if (reservation.getName().equals(message.getText().split(" ")[0]) &&
                             reservation.getDateTime().format(DateTimeFormatter.ofPattern("dd HH:mm")).equals(message.getText().substring(message.getText().indexOf(" ") + 1))) {
-                        reservationFound.set(reservation);
                         reservation.setDone(true);
+                        reservationFound.set(reservation);
                     }
                 });
                 if (reservationFound.get().isConfirmed()) {
-                    for (UserEntity admin: userService.findAllAdmins()){
-                        reply.add(messageService.getReplyMessage(admin.getUserID(), "Бронь на имя " + reservationFound.get().getName() + " на время " + reservationFound.get().getDateTime().format(DateTimeFormatter.ofPattern("dd HH:mm")) + " пришла." , AdminKeyboards.adminMainPanel()));
+                    for (UserEntity admin : userService.findAllAdmins()) {
+                        reply.add(messageService.getReplyMessage(admin.getUserID(), "Бронь на имя " + reservationFound.get().getName() + " на время " + reservationFound.get().getDateTime().format(DateTimeFormatter.ofPattern("dd HH:mm")) + " пришла.", AdminKeyboards.adminMainPanel()));
                     }
-                    resService.delete(reservationFound.get().getUserID());
+                        resService.save(reservationFound.get());
+                        reply.add(messageService.getReplyMessage(chatId,
+                                "Чем ещё могу помочь?", AdminKeyboards.adminMainPanel()));
+                        userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_TO_DO);
+                    } else{
+                        reply.add(messageService.getReplyMessage(chatId, "Нет ближайших броней с такими параметрами", AdminKeyboards.adminMainPanel()));
+                        userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_TO_DO);
+                    }
+                } else {
+                    reply.add(messageService.getReplyMessage(chatId, "Нет ближайших броней", AdminKeyboards.adminMainPanel()));
+                    userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_TO_DO);
+                }
+            }
+        if (botState.equals(BotState.COLLECT_ADMIN_LEAVE_RESERVATION)) {
+            AtomicReference<ReservationEntity> reservationFound = new AtomicReference<>();
+            if (resService.findAllActive().size() > 0) {
+                resService.findAllActive().forEach(reservation -> {
+                    if (reservation.getName().equals(message.getText().split(" ")[0]) &&
+                            reservation.getDateTime().format(DateTimeFormatter.ofPattern("dd HH:mm")).equals(message.getText().substring(message.getText().indexOf(" ") + 1))) {
+                        reservation.setEnd(true);
+                        reservationFound.set(reservation);
+                    }
+                });
+                if (reservationFound.get().isEnd()) {
+                    for (UserEntity admin: userService.findAllAdmins()){
+                        reply.add(messageService.getReplyMessage(admin.getUserID(), "Бронь на имя " + reservationFound.get().getName() + " на время " + reservationFound.get().getDateTime().format(DateTimeFormatter.ofPattern("dd HH:mm")) + " уолучила сообщение об обратной связи." , AdminKeyboards.adminMainPanel()));
+                    }
+                    ReservationEntity reservation = reservationFound.get();
+                    userService.setUserCurrentState(reservation.getUserID(), BotState.COLLECT_FEEDBACK_SCORE);
+                    reply.add(messageService.getReplyMessage(reservation.getUserID(), "Спасибо за посещение Amigo lounge. Пожалуйста оцените уровеь сервиса в нашем заведении.", UserKeyboards.userFeedbackPanel()));
+                    resService.save(reservation);
                     reply.add(messageService.getReplyMessage(chatId,
                             "Чем ещё могу помочь?", AdminKeyboards.adminMainPanel()));
                     userService.setUserCurrentState(userId, BotState.COLLECT_ADMIN_TO_DO);

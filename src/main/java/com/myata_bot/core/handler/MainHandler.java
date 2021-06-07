@@ -60,7 +60,7 @@ public class MainHandler implements InputMessageHandler {
         if (botState.equals(BotState.COLLECT_TO_DO)) {
             switch (message.getText()) {
                 case "Забронировать столик" -> {
-                    if (resService.findByUserID(userId) != null){
+                    if (!resService.findByUserID(userId).isDone()){
                         reply.add(messageService.getReplyMessage(userId, "У вас уже имеется активная бронь."));
                     } else {
                         ReservationEntity reservationEntity = new ReservationEntity();

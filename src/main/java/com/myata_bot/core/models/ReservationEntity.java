@@ -20,5 +20,8 @@ public class ReservationEntity {
     boolean completed = false;
     boolean confirmed = false;
     boolean done = false;
+    boolean end = false;
+    String score;
+    String feedback;
     String confirmedBy;
 }

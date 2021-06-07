@@ -41,4 +41,22 @@ public class UserKeyboards {
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
+
+    public static ReplyKeyboardMarkup userFeedbackPanel() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        keyboardFirstRow.add(new KeyboardButton("1"));
+        keyboardFirstRow.add(new KeyboardButton("2"));
+        keyboardFirstRow.add(new KeyboardButton("3"));
+        keyboardFirstRow.add(new KeyboardButton("4"));
+        keyboardFirstRow.add(new KeyboardButton("5"));
+        keyboard.add(keyboardFirstRow);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
+    }
 }

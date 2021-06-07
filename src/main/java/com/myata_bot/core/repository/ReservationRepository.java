@@ -14,4 +14,5 @@ public interface ReservationRepository  extends MongoRepository<ReservationEntit
     void deleteByUserID(int userID);
     List<ReservationEntity> findAllByDoneIsFalse();
     List<ReservationEntity> findAllByDateTimeBetween(LocalDateTime first, LocalDateTime second);
+    List<ReservationEntity> findAllByDoneIsTrue();
 }
